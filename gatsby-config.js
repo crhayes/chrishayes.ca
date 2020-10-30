@@ -1,8 +1,20 @@
 module.exports = {
+  siteMetadata: {
+    title: `Chris Hayes`,
+    author: `Chris Hayes`,
+    description: `Chris Hayes is a Senior Software Engineer living and working in Toronto, ON, specialized in building web applications. He employs a strong product focus and a keen eye for good design and UX.`,
+  },
   plugins: [
+    `gatsby-theme-blog-core`,
     {
-      resolve: `gatsby-theme-blog-core`,
-      options: {},
+      resolve: `gatsby-plugin-theme-ui`,
+      options: {
+        preset: false,
+        prismPreset: `github`,
+      },
     },
+    `gatsby-plugin-react-helmet`,
+    `gatsby-plugin-twitter`,
+    `gatsby-plugin-emotion`,
   ],
 }
