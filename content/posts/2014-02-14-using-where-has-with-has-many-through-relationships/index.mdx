@@ -1,0 +1,45 @@
+---
+title: Using whereHas() with HasManyThrough Relationships
+date: 2014-02-14
+slug: using-where-has-with-has-many-through-relationships
+tags: [Laravel]
+---
+
+I’ve discovered an issue with Eloquent in which using the `whereHas()` method with a `HasManyThrough` relationship returns the wrong results.
+
+For instance, if I have the following model structure:
+
+```
+Business
+  - hasMany Lead
+  - hasManyThrough Purchase (through Lead)
+
+Lead
+  - belongsTo Business
+  - hasOne Purchase
+
+Purchase
+  - belongsTo Lead
+```
+
+the following code will yield unexpected results:
+
+```php
+$businesses = Business::whereHas('purchases', function($query)
+{
+    $query->where( // insert where clause here );
+})->get();
+```
+
+I’ve sent a pull request to fix the issue but it needs to be discussed, so for now you can do use nested `whereHas()` calls like so:
+
+```php
+$businesses = Business::whereHas('leads', function($query)
+{
+	$query->whereHas('purchase', function($query)
+	{
+		$query->where( // insert where clause here );
+	});
+})
+->get();
+```

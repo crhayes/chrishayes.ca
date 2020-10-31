@@ -1,0 +1,38 @@
+---
+title: Laravel Extended Validator
+date: 2013-12-04
+image: ./checklist.jpg
+imageAlt: Person writing a checklist
+imageURL: https://unsplash.com/photos/RLw-UC03Gwc
+slug: laravel-extended-validator
+tags: [Laravel]
+---
+
+I released my first Laravel 4 package today, which is a couple of classes that build on top of Laravel’s Validator library.
+
+Take a look at this snippet, then [view the project on Github](https://github.com/crhayes/laravel-extended-validator) to see how it can assist your validation.
+
+```php
+$userValidator = UserValidator::make(Input::only('first_name', 'last_name'))
+    ->addContext('create');
+$carValidator = CarValidator::make(Input::only('make', 'model'))
+    ->addContext('create');
+
+$groupedValidator = GroupedValidator::make()
+    ->addValidator($userValidator)
+    ->addValidator($carValidator);
+
+if ($groupedValidator->passes()) {
+    // yay
+}
+```
+
+The main reasons I created this package are:
+
+1. To ease the creation of validation services – we all know validaton should be moved out of the controller
+2. Provide an easy way to provide context for validations – such as providing a modified set of validation rules for edit vs. create
+3. Provide an easy way to group validations – that is, calling one `passes()` method to validate multiple models
+
+It is documented on Github and I’ll write a more in depth blog post about it in the near future.
+
+For now, [visit the project on Github](https://github.com/crhayes/laravel-extended-validator)!

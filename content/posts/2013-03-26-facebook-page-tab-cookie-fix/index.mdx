@@ -1,0 +1,87 @@
+---
+title: Facebook Page Tab Cookie Fix
+date: 2013-03-26
+image: ./cookies.jpg
+imageAlt: Warm cookie broken apart exposing gooey chocolate
+imageURL: https://unsplash.com/photos/OfdDiqx8Cz8
+slug: facebook-page-tab-cookie-fix
+tags: [PHP]
+---
+
+## The Problem
+
+Having problems setting cookies in a Facebook iFrame app? Safari 6 (and other browsers will soon follow) now disables third-party cookies by default, and if there is one thing the average user does not do it’s change default settings.
+
+Because your application is hosted on your own domain, and it’s loaded within an iFrame on Facebook, any cookies or sessions you set will be considered "3rd-party". **The only way you can successfully set sessions or cookies is if your users have visited your domain previously.**
+
+## The Solution
+
+This solution will be written in the context of an MVC application, but it can be adapted to more a more procedural style as well.
+
+## The Code
+
+```php
+class FacebookController extends Controller
+{
+      public function postIndex()
+	{
+		if (Arr::get('signed_request', $_REQUEST, false) && ! Cookie::get('cookie_fix')) {
+			die('<script type="text/javascript">window.top.location = "' . route('cookie_fix') . '"</script>');
+		}
+
+		// Ask the user to authenticate the app if they haven't already
+		if ( ! $this->facebook->getUser()) {
+			$this->facebook->authenticateUser();
+		}
+
+		return Redirect::to('index');
+	}
+
+	public function getCookieFix()
+	{
+		Cookie::set('cookie_fix', 'true');
+
+		return Redirect::to(Config::get('facebook.urls.pagetab'), 307);
+	}
+}
+```
+
+```php
+class IndexController extends FacebookController
+{
+	public function getIndex()
+	{
+		// Index page of your app
+	}
+
+	public function getAbout()
+	{
+		// About page of your app
+	}
+
+}
+```
+
+## The Explanation
+
+This code is specific to a framework I’ve built and use, but it demonstrates the process very clearly.
+
+### Controllers
+
+Here I have used two controllers, a `FacebookController` for handing the Facebook specific functionality, and an `IndexController` to contain the app functionality.
+
+### Check For Cookies On App Load
+
+First of all we have a method `postIndex()` which is responding to `POST` requests to the index page of the application (i.e. our initial app load). When the app loads it checks to make sure there is a signed request parameter, and also to see whether or not we have a "cookie fix" cookie set.
+
+If the "cookie fix" cookie is not set, we assume the user has never visited our domain and that we are not permitted to set cookies or sessions. We kill the script and ouput some JavaScript that will redirect the page tab iFrame’s parent (i.e. Facebook.com) to an endpoint on our site, `/cookie_fix`.
+
+### Redirect To Our Site When No Cookies
+
+The GET request to the `/cookie_fix` endpoint is handled by the function `getCookieFix()`, which sets the `cookie_fix` cookie and redirects back to our application. In my application `Config::get(‘facebook.urls.pagetab’)` returns the path to my facebook page tab application (i.e. `https://facebook.com/pages/...`).
+
+### Reload App With Cookie Set
+
+Facebook will then send another `POST` request to the index of your application, and this time when you check for the existence of the `cookie_fix` cookie it will pass.
+
+From this point on you can set sessions and cookies and they will carry forward throughout your app.

@@ -1,0 +1,114 @@
+---
+title: Methods for Staying Organized
+date: 2013-07-06
+image: ./organized-items.jpg
+imageAlt: Organized personal items on a desk
+imageURL: https://unsplash.com/photos/XVhgrKy8C4g
+slug: methods-for-staying-organized
+tags: [Laravel]
+---
+
+Laravel 4 already has a place for pretty much everything, so it feels organized out of the box. However, the larger your application is the more unorganized it starts to feel. Here are a few small things I do to help keep things organized.
+
+## Namespace Controllers and Models
+
+This one is pretty simple, but I namespace all of my controllers and models. For instance, `UserController.php` might look like this:
+
+`app/controllers/UserController.php`
+
+```php
+namespace App\Controllers;
+
+class UserController extends BaseController
+{
+    // code goes here
+}
+```
+
+My models generally are namespaced like so:
+
+`app/models/User.php`
+
+```php
+namespace App\Models;
+
+class User extends \Eloquent
+{
+    protected $table = 'users';
+
+    // code goes here
+}
+```
+
+## Map Table Prefixes to Namespaces
+
+Let’s assume the following: we have a business and the business has many executives. This is a one-to-many relationship; the business can have many executives and each executive belongs to the business.
+
+The tables `businesses` and `business_executives` seems reasonable for this setup. Since the executives belong to the business we prefix the `executives` table with `business_`. To help organize the related models I like to utilize namespacing. The related models would look like this:
+
+`app/models/Business.php`
+
+```php
+namespace App\Models;
+
+class Business extends \Eloquent
+{
+    protected $table = 'businesses';
+
+    public function executives()
+    {
+    	return $this->hasMany('App\Models\Business\Executive');
+    }
+}
+```
+
+`app/models/business/Executive.php`
+
+```php
+namespace App\Models\Business;
+
+class Executive extends \Eloquent
+{
+	protected $table = 'business_executives';
+
+	public function business()
+	{
+		return $this->belongsTo('App\Models\Business');
+	}
+}
+```
+
+## Utilize Repositories
+
+[Jeffrey Way](http://net.tutsplus.com/author/jeffreyway/) wrote an [excellent article](http://net.tutsplus.com/tutorials/php/testing-laravel-controllers/) that covers the use of repositories within Laravel (scroll down to the Repositories heading), so I’ll refer you to that article if you’re not sure what repositories are.
+
+However, in short repositories are an additional level of abstraction. They sit between your controllers and your models and act as a data-access layer, allowing your controllers to query data without accessing your models directly.
+
+This is especially useful if you don’t want to muddy up your Eloquent models (keep them "pure") or if you have specific functionality that requires several models; for instance, if your application is creating an event with several occurrences and must insert both `Event` and `EventOccurrence` models then you can perform both of these actions within a single method in the repository. An example might look like this:
+
+`app/repositories/EventRepository.php`
+
+```php
+namespace App\Repositories;
+
+use App\Models\Event;
+use App\Models\Event\Occurrence;
+
+class EventRepository
+{
+	public function save()
+	{
+		$event = new Event;
+		// populate event properties
+		$event->save();
+
+		$eventOccurrence = new Occurrence;
+		// populate event occurrence properties
+		$event->occurrences()->save($eventOccurrence);
+	}
+}
+```
+
+The repository is also a great place to consolidate validations. In the previous example, validations for both models can be performed within the `save()` method, and validation rules for saving an event can be stored together in the repository rather than separately within the models (or together in the controller) – this helps keep your models clean and your controllers slim.
+
+If you have any of your own methods for organizing projects please post them in the comments below!

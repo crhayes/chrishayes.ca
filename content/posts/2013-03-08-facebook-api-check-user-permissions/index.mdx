@@ -1,0 +1,59 @@
+---
+title: "Facebook API: Check User Permissions"
+date: 2013-03-08
+slug: facebook-api-check-user-permissions
+tags: [PHP]
+---
+
+Here is a simple function (modified from a class I wrote to simplify Facebook API calls) to check if there are discrepencies between the `scope` of the Facebook app and the permissions granted by the user.
+
+```php
+function checkPermissions($scope, $facebook)
+{
+    // Break the scope into an array
+    $scope = array_map('trim', explode(",", $scope));
+
+    // Get the users permissions from Facebook and put them in an array
+    $getUserPerms = $facebook->api('/me/permissions');
+    $userPerms = array_keys($getUserPerms['data'][0]);
+
+    // Permissions not granted is the difference between these arrys
+    $ungrantedPerms = array_diff($scope, $userPerms);
+
+    if ( ! empty($ungrantedPerms)) {
+        // authenticate user again
+    }
+}
+```
+
+It assumes you have your scope defined in the following format:
+
+```php
+$scope = 'email, user_about_me, user_likes, manage_pages, publish_stream';
+```
+
+For a more object oriented approach you could do something like:
+
+```php
+// Assuming we have an instance of the facebook library and the scope stored
+private $facebook;
+private $scope;
+
+/**
+ * Return an array of the permissions that haven't been granted.
+ */
+private function ungrantedPermissions()
+{
+    $scope = $this->scope;
+
+    // Break the scope into an array
+    $scope = array_map('trim', explode(",", $scope));
+
+    // Get the users permissions from Facebook and put them in an array
+    $getUserPerms = $this->facebook->api('/me/permissions');
+    $userPerms = array_keys($getUserPerms['data'][0]);
+
+    // Permissions not granted is the difference between these arrys
+    return array_diff($scope, $userPerms);
+}
+```

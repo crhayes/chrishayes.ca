@@ -1,0 +1,35 @@
+---
+title: Easily Cache Eloquent Collections
+date: 2013-06-13
+image: ./books.jpg
+imageAlt: Stack of books
+imageURL: https://unsplash.com/photos/lUaaKCUANVI
+slug: easily-cache-eloquent-collections
+tags: [Laravel]
+---
+
+I found an article by Mark van Eijk that outlines [how to easily cache Eloquent results](http://markvaneijk.com/quick-tip-caching-eloquent-in-laravel-4) by using the following syntax:
+
+```php
+$articles = Article::with('comments')->remember(5)->get();
+```
+
+I wanted to point out that in the event you want to cache all articles, the following syntax doesn’t work
+
+```php
+$articles = Article::all()->remember(5); // doesn't work
+```
+
+What you need to do instead is the following:
+
+```php
+$articles = Article::remember(5)->get(); // works great!
+```
+
+You can verify the query is not run on subsequent requests by dd’ing the queries that were run during the request:
+
+```php
+dd(\DB::getQueryLog());
+```
+
+Hope this helps someone! If you have any Laravel tricks of your own post them in the comments below.

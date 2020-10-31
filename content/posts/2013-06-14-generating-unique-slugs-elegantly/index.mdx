@@ -1,0 +1,43 @@
+---
+title: Generating Unique Slugs Elegantly
+date: 2013-06-14
+image: ./slug.jpg
+imageAlt: Slug on a leaf
+imageURL: https://unsplash.com/photos/Ytrf-KJ9ZV0
+slug: generating-unique-slugs-elegantly
+tags: [Laravel]
+---
+
+Using slugs in URLs is a great alternative to strictly using integers (ids), as it improves SEO by allowing you to get more context in the URL. However, generating them can be a pain. Here is a super simple method for generating slugs that you can adapt to your own needs.
+
+```php
+private function getEventSlug($title)
+{
+	$slug = Str::slug($title);
+	$slugCount = count( $this->event->whereRaw("slug REGEXP '^{$slug}(-[0-9]*)?$'")->get() );
+
+	return ($slugCount > 0) ? "{$slug}-{$slugCount}" : $slug;
+}
+```
+
+Easy! Here I am generating slugs for events; you’ll need to modify the code for your own purposes.
+
+### Explanation
+
+We accept the title we want to slugify as a parameter and use Laravel’s string helper to convert it to a slug. From there we query our event model using the `whereRaw()` method and perform a regex expression to grab all the events with slugs matching the title, or matching the title with a number appended to the end. We count the results, and if there are matching slugs we append that number to the slug to make it unique.
+
+A more general version of the method might look like this:
+
+```php
+public function getSlug($title, $model)
+{
+	$slug = Str::slug($title);
+	$slugCount = count( $model->whereRaw("slug REGEXP '^{$slug}(-[0-9]*)?$'")->get() );
+
+	return ($slugCount > 0) ? "{$slug}-{$slugCount}" : $slug;
+}
+```
+
+Enjoy! If you have any Laravel tricks of your own please post them in the comments below.
+
+**Note:** This works with MySQL but likely won’t work with other RDBMSs; the concept should work but the regular expression implementation is likely different.

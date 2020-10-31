@@ -1,0 +1,78 @@
+---
+title: DRY Up Your Views With Form & HTML Macros
+date: 2014-02-04
+image: ./desert.jpg
+imageAlt: Dry desert with cracked earth
+imageURL: https://unsplash.com/photos/ntpSfI1t4c8
+slug: dry-up-your-views-with-form-and-html-macros
+tags: [Laravel]
+---
+
+This is just a quick post to give a couple of examples where form/HTML macros are useful, and to advocate their usage in general.
+
+## Reusable Components
+
+In my larger projects I like to create form and HTML macros to DRY up repetitive view-related tasks and also make the views more clean and concise. Here are a couple of examples:
+
+```php
+// Drop-down to select country
+Form::macro('countrySelect', function($name, $selected = 0, $options = [])
+{
+	$countries = [0 => 'Select Country'] + Country::remember(60)->get()->lists('name', 'id');
+
+	return Form::select($name, $countries, $selected, $options);
+});
+
+//Drop-down to select province
+Form::macro('provinceSelect', function($name, $selected = 0, $options = [])
+{
+	$provinces = [0 => 'Select Province'] + Province::remember(60)->get()->lists('name', 'id');
+
+	return Form::select($name, $states, $selected, $options);
+});
+```
+
+Here we have created a couple of reusable components: a Select Province drop-down and a Select Country drop-down. The great thing about this is that the logic for populating the dropdowns is contained to one method (including caching!), and usage throughout the app is extremely simple:
+
+```php
+{{ Form::countrySelect('country') }}
+```
+
+## Wrapping jQuery
+
+I also like to use form/HTML macros to wrap elements that have added jQuery functionality. For example, I may have a city field using `typeahead.js` to automatically suggest cities populated from the database as the user starts typing. The form macro literally acts as a wrapper around a text field and applies the typeahead class to it, and then jQuery does this rest. For example:
+
+```php
+// This form macro allows us to specify options, but also adds the
+// class 'select-city' which can be utilized by the typeahead.js library
+Form::macro('city', function($name, $value = null, $options = [])
+{
+	$defaultOptions = [
+		'class'       => 'select-city',
+	];
+	$options = combineOptions($defaultOptions, $options);
+
+	return Form::text($name, $value, $options);
+});
+
+// Just a simple helper function to clean up the code
+function combineOptions($default, $specified)
+{
+	$options = array_merge_recursive($default, $specified);
+
+	return array_map(function($item)
+	{
+		if (is_array($item)) {
+			return implode(' ', $item);
+		}
+
+		return $item;
+	}, $options);
+}
+```
+
+I prefer this because the logic is contained to one method, and if we ever need to modify the markup for all typeahead search fields in the future we can do this from a centralized location.
+
+These are all form macro examples, but the concepts are the same for HTML macros!
+
+Stay tuned for an upcoming post where I’ll show how to move this global code into object oriented classes loaded by the Laravel core via a service provider.

@@ -1,0 +1,85 @@
+---
+title: Setting Up and Utilizing Environments
+date: 2013-08-13
+image: ./coder.jpg
+imageAlt: Top-down view of programmer sitting at a desk with three monitors
+imageURL: https://unsplash.com/photos/qAjJk-un3BI
+slug: setting-up-and-utilizing-environments
+tags: [Laravel]
+---
+
+Have you ever developed your application locally, then taken it live on your production server and had to manually change your app configuration (say, your database credentials) to match the production server? If you have, then continue reading and learn how configuring environments in Laravel can save you from this headache.
+
+## Environments
+
+Software projects are typically deployed in various environments. You likely develop your application locally in a development environment. You then have your live server where your site resides, known as the production environment. Many applications will have a staging environment, essentially a duplicate of your production environment, where apps are deployed and tested before being pushed to production. Larger applications may have other environments in between.
+
+Each of these environments may require different configuration, and luckily we can easily handle that in Laravel.
+
+## Default Environment and Configuration
+
+The default environment in Laravel is production; in other words, without making any of the aforementioned changes your app will be considered in ‘production’. Any files within the root of the `app/config` folder will be considered the configuration for the production environment; that includes `app/config/cache.php` , `app/config/app.php` , `app/config/database.php` and others.
+
+## Setting Environments
+
+We can set different environments in Laravel and subsequently use different configuration. Open up the `bootstrap/start.php` file in your Laravel application. Here you will see the following block of code:
+
+```php
+$env = $app->detectEnvironment(array(
+
+	'local' => array('your-machine-name'),
+
+));
+```
+
+This is where we define our environments within the application. Each key in this array is the name of an environment and the corresponding value is an array of URLs that will match this environment. Below is an example of an environment configuration I might use in an application:
+
+```php
+$env = $app->detectEnvironment(array(
+
+	'local'   => array('localhost'),
+	'staging' => array('staging.example.com')
+
+));
+```
+
+In the example above, when I view my application on my localhost the environment will be set to **local**. When I deploy my application to my **staging** server set at `staging.example.com`, my application environment will be **staging**. These can be named whatever you like. For instance, I could use the following:
+
+```php
+$env = $app->detectEnvironment(array(
+
+	'dev'     => array('localhost'),
+	'staging' => array('staging.example.com')
+
+));
+```
+
+to name my development environment **dev** rather than **local**.
+
+## Loading Config Based on Environment
+
+The real power of environments comes from being able to load different configuration based on the environment, and Laravel makes this dead simple.
+
+For instance, say you have different database credentials for your local development environment. All you need to do is copy the `app/config/database.php` config file to `app/config/local/database.php`. If your staging environment has a different set of database credentials from your local or production environments it can have it’s own configuration stored in `app/config/staging/database.php`.
+
+The idea is that you use the environment key you defined in `bootstrap/start.php` as the folder name, and then copy any configuration files you need to override into this folder and change the values accordingly.
+
+In fact, you don’t even need to copy the entire configuration file, you can copy only the array keys within the configuration file that you need to override and these will be merged with the default values in the production configuration files!
+
+## Environments and Artisan
+
+By default Artisan commands are run with the default production configuration; however, if you are developing locally and need to migrate a database this doesn’t help. What you can do is pass a flag with the Artisan command that will utilize the configuration for the environment you specify. For example, if you wanted to migrate your database in your production environment it might look like this:
+
+```shell
+$ php artisan migrate --env=local
+```
+
+If you wanted to seed your database in your staging environment if might look like:
+
+```shell
+$ php artisan db:seed --env=staging
+```
+
+## Conclusion
+
+Environments in Laravel are extremely powerful and allow you to configure your application for various stages of development and deployment. I hope you found this article helpful and if you have any comments, questions, or additions please include them in the comments below!

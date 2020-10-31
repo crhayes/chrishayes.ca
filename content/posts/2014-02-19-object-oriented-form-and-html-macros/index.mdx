@@ -1,0 +1,121 @@
+---
+title: Object Oriented Form & HTML Macros
+date: 2014-02-19
+image: ./scrabble.jpg
+imageAlt: Scrabble pieces on a table
+imageURL: https://unsplash.com/photos/lMiYuow_KZE
+slug: object-oriented-form-and-html-macros
+tags: [Laravel]
+---
+
+[In an earlier post](/dry-up-your-views-with-form-and-html-macros) I talked about how to utilize form and HTML macros to DRY up your views. The one thing I don’t like about these form macros is that they are global code, and it doesn’t really feel like they have a proper home. Sure, we can put that code in our `routes.php` , or `global.php` , but it definitely takes away from the object-oriented nature of the framework. Furthermore, any common functionality between macros can only be refactored into a global function rather than a class method.
+
+In this post I’ll discuss how we can refactor that code into classes and load it with a service provider class.
+
+## Preparation
+
+In preparation you’ll need a place to store these files. You can choose anywhere really, but a common convention in the Laravel community is to create a folder with the name of your application in the app directory.
+
+So, if your app was called Zizzle (don’t ask) you’d create the folder `app/Zizzle`. You can then put the classes we’ll create in an Extensions folder, so `app/Zizzle/Extensions`, and since the Laravel core namespaces both form and HTML macros under a common namespace, we’ll create another folder within called Html resulting in `app/Zizzle/Extensions/Html`.
+
+## Refactoring Your Form Macros
+
+Let’s create a new home for our form macros under the directory we just created. To do so create a new file at `app/Zizzle/Extensions/Html/FormBuilder.php` and insert the following code:
+
+```php
+namespace Zizzle\Extensions\Html;
+
+class FormBuilder extends \Illuminate\Html\FormBuilder
+{
+	public function yourFirstFormMacro($value1, $value2)
+	{
+		// congrats!
+	}
+}
+```
+
+As you can see it’s very simple. We are just extending the core Laravel FormBuilder class and adding our own macro methods to it. So, rather than adding macros like this:
+
+```php
+Form::macro('myMacro', function()
+{
+    // macro here
+});
+```
+
+we simply add a new method to our FormBuilder class with the name we want to give the macro.
+
+## Refactoring Your HTML Macros
+
+The process of refactoring HTML macros is much the same. Create a new file located at `app/Zizzle/Extensions/Html/HtmlBuilder.php` and add the following code:
+
+```php
+namespace Zizzle\Extensions\Html;
+
+class HtmlBuilder extends \Illuminate\Html\HtmlBuilder
+{
+	public function yourFirstHtmlMacro($value1, $value2)
+	{
+		// congrats!
+	}
+}
+```
+
+Here we are simply extending the core Laravel HtmlBuilder class, and at this point adding HTML macros is the same process as adding form macros.
+
+## Creating a Service Provider
+
+Now that we have extended the core Laravel HTML and form macro classes to add our own macros in a clean, object-oriented way, we need to be able to tell Laravel how to access our code. We do this by creating a [service provider](http://laravel.com/docs/ioc#service-providers) in order to bind our classes to the [Laravel IOC container](http://laravel.com/docs/ioc#introduction), which essentially tells Laravel to load instances of our HTML and form macro classes instead of the core Laravel classes. The code is fairly straightforward if you’ve read through the Laravel documentation. Create a new file located at `app/Zizzle/Extensions/Html/HtmlServiceProvider.php` and add the following code:
+
+```php
+namespace Zizzle\Extensions\Html;
+
+class HtmlServiceProvider extends \Illuminate\Html\HtmlServiceProvider
+{
+	/**
+	 * Register the HTML builder instance.
+	 *
+	 * @return void
+	 */
+	protected function registerHtmlBuilder()
+	{
+		$this->app->bindShared('html', function($app)
+		{
+			return new HtmlBuilder($app['url']);
+		});
+	}
+
+	/**
+	 * Register the form builder instance.
+	 *
+	 * @return void
+	 */
+	protected function registerFormBuilder()
+	{
+		$this->app->bindShared('form', function($app)
+		{
+			return new FormBuilder($app['html'], $app['url'], $app['session.store']->getToken());
+		});
+	}
+}
+```
+
+Basically we override the two methods from the core Laravel HtmlServiceProvider, `registerHtmlBuilder` and `registerFormBuilder`, and within return instances of our newly created classes.
+
+## Bootstrap the Service Provider
+
+With the service provider created we need to let Laravel know how to load it. Luckily that’s easy too! Open up `app/config/app.php` and add the following line to the `providers` array:
+
+```php
+'providers' => array(
+
+    ...
+
+    'Zizzle\Extensions\Html\HtmlServiceProvider',
+
+),
+```
+
+And that’s it! With that in place you can officially move your global macro code into classes that extend from the Laravel core and bootstrap that code within the Laravel framework.
+
+If you have any questions please feel free to ask!

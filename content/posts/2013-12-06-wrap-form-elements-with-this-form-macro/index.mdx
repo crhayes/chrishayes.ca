@@ -1,0 +1,34 @@
+---
+title: Wrap Form Elements With This Form Macro
+date: 2013-12-06
+image: ./gifts.jpg
+imageAlt: Table with several gift wrapped items
+slug: wrap-form-elements-with-this-form-macro
+tags: [Laravel]
+---
+
+This trick is handy for wrapping all of your form elements with the same HTML/classes, which is especially useful for handling error states when using frameworks like Bootstrap or Foundation.
+
+```php
+$errors = Session::get('errors', new Illuminate\Support\MessageBag);
+
+Form::macro('bootwrapped', function($name, $label, $callback) use ($errors)
+{
+  return sprintf(
+    '<div class="form-group %s">
+      <label class="control-label">%s</label>
+      %s
+      %s
+    </div>',
+    $errors->has($name) ? 'has-error' : '',
+    $label,
+    $callback($name),
+    $errors->first($name, '<span class="help-block">:message</span>')
+  );
+});
+
+Form::bootwrapped('email', 'Email', function($name)
+{
+  return Form::text($name, null, ['class' => 'form-control']);
+});
+```
