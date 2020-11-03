@@ -16,5 +16,6 @@ module.exports = {
     `gatsby-plugin-react-helmet`,
     `gatsby-plugin-twitter`,
     `gatsby-plugin-emotion`,
+    `gatsby-plugin-preload-fonts`,
   ],
 }

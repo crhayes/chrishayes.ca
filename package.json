@@ -6,7 +6,8 @@
     "develop": "gatsby develop",
     "start": "gatsby develop",
     "build": "gatsby build",
-    "clean": "gatsby clean"
+    "clean": "gatsby clean",
+    "preload-fonts": "gatsby-preload-fonts"
   },
   "license": "0BSD",
   "dependencies": {
@@ -20,6 +21,7 @@
     "gatsby-plugin-emotion": "^4.3.14",
     "gatsby-plugin-feed": "^2.5.20",
     "gatsby-plugin-feed-mdx": "^1.0.1",
+    "gatsby-plugin-preload-fonts": "^1.2.29",
     "gatsby-plugin-react-helmet": "^3.3.14",
     "gatsby-plugin-theme-ui": "0.4.0-rc.5",
     "gatsby-plugin-twitter": "^2.3.12",
