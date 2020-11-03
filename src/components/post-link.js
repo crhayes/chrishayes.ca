@@ -15,6 +15,7 @@ const PostLink = ({
   date,
 }) => (
   <article
+    id={slug.replace(/\//g, "")}
     sx={{
       animation: `0.2s ${index * 0.02}s fadeInUp backwards`,
       transition: "transform 0.2s",

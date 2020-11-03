@@ -1,7 +1,10 @@
 /** @jsx jsx */
+import React from "react"
 import { jsx, Container, Styled } from "theme-ui"
+import { graphql, useStaticQuery } from "gatsby"
 
 import Layout from "../components/layout"
+import PostGrid from "../components/post-grid"
 import SEO from "../components/seo"
 import Skills from "../components/skills"
 
@@ -95,10 +98,75 @@ const Home = () => (
         <p sx={{ mb: 5, color: "muted" }}>
           My latest writings on code, learnings, and career experiences.
         </p>
-        {/* <ArticlesGrid /> */}
+        <RecentRamblings />
       </section>
     </Container>
   </Layout>
 )
+
+const NUM_POSTS_TO_DISPLAY = 6
+
+const RecentRamblings = () => {
+  const data = useStaticQuery(QUERY)
+  const {
+    allBlogPost: { nodes: allPosts },
+  } = data
+  const displayedPosts = allPosts.slice(0, NUM_POSTS_TO_DISPLAY)
+
+  return (
+    <>
+      <PostGrid posts={displayedPosts} />
+      {(() => {
+        // If all posts can fit on the home page we don't need a "more" button
+        if (displayedPosts.length >= allPosts.length) return
+
+        // Otherwise if we have more than `NUM_POSTS_TO_DISPLAY` posts we'll link to the articles page
+        const lastPostSlug = displayedPosts[NUM_POSTS_TO_DISPLAY - 1].slug
+
+        // We create a direct link using the last post's slug so the reader
+        // can pick up where they left off on the articles page
+        return (
+          <div sx={{ display: "flex", justifyContent: "center", mt: 7 }}>
+            <Styled.a
+              href={`/articles#${lastPostSlug.replace(/\//g, "")}`}
+              sx={{
+                px: 5,
+                py: 3,
+                border: "1px solid",
+                borderColor: "border",
+                borderRadius: 99999,
+              }}
+            >
+              Continue Perusing &#8594;
+            </Styled.a>
+          </div>
+        )
+      })()}
+    </>
+  )
+}
+
+const QUERY = graphql`
+  query HomePageQuery {
+    allBlogPost(sort: { fields: [date, title], order: DESC }, limit: 1000) {
+      nodes {
+        id
+        excerpt
+        slug
+        title
+        date(formatString: "MMMM DD, YYYY")
+        tags
+        image {
+          childImageSharp {
+            fluid(maxWidth: 300, maxHeight: 190, cropFocus: CENTER) {
+              ...GatsbyImageSharpFluid_noBase64
+            }
+          }
+        }
+        imageAlt
+      }
+    }
+  }
+`
 
 export default Home
