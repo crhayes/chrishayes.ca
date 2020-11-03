@@ -1,5 +1,4 @@
 /** @jsx jsx */
-import React from "react"
 import Image from "gatsby-image"
 import { MDXRenderer } from "gatsby-plugin-mdx"
 import { graphql, useStaticQuery } from "gatsby"
@@ -32,12 +31,12 @@ const Post = ({
     />
     <Container as="main" sx={{ maxWidth: "blogPostContainer" }}>
       <article sx={{ fontSize: 3 }}>
-        <header sx={{ mt: 7 }}>
+        <header sx={{ mt: [5, 7] }}>
           <Tags tags={post.tags} />
-          <Styled.h1 sx={{ mt: 2 }}>{post.title}</Styled.h1>
-          <Meta date={post.date} />
+          <Styled.h1 sx={{ mt: 3 }}>{post.title}</Styled.h1>
+          <Meta date={post.date} sx={{ mt: 3 }} />
         </header>
-        <section>
+        <section sx={{ mt: [5, 6] }}>
           <MDXRenderer>{post.body}</MDXRenderer>
         </section>
       </article>
@@ -45,7 +44,7 @@ const Post = ({
   </Layout>
 )
 
-const Meta = ({ date }) => {
+const Meta = ({ date, ...props }) => {
   const data = useStaticQuery(graphql`
     query PostMetaQuery {
       site {
@@ -77,9 +76,8 @@ const Meta = ({ date }) => {
       sx={{
         gridGap: 3,
         alignItems: "center",
-        mt: 3,
-        mb: 6,
       }}
+      {...props}
     >
       <Image
         sx={{

@@ -43,6 +43,7 @@ const Header = () => (
           href="/"
           sx={{
             variant: "link",
+            display: ["none", "block"],
             mr: 3,
             animation: fadeInDownAnimation,
             animationDelay: `${3 * 0.1}s`,
@@ -64,7 +65,7 @@ const Header = () => (
       <div sx={{ display: "flex" }}>
         <a
           href="https://github.com/crhayes"
-          alt="Github"
+          aria-label="Visit My Github"
           target="_blank"
           rel="noopener noreferrer"
           sx={{
@@ -76,11 +77,11 @@ const Header = () => (
             animationDelay: `${5 * 0.1}s`,
           }}
         >
-          <GitHub size={18} />
+          <GitHub size={18} alt="Github" />
         </a>
         <a
           href="https://linkedin.com/in/crhayes"
-          alt="LinkedIn"
+          aria-label="Visit My LinkedIn"
           target="_blank"
           rel="noopener noreferrer"
           sx={{
@@ -92,11 +93,11 @@ const Header = () => (
             animationDelay: `${6 * 0.1}s`,
           }}
         >
-          <Linkedin size={18} />
+          <Linkedin size={18} alt="LinkedIn" />
         </a>
         <a
           href="https://twitter.com/crhayes_"
-          alt="Twitter"
+          aria-label="Visit My Twitter"
           target="_blank"
           rel="noopener noreferrer"
           sx={{
@@ -107,7 +108,7 @@ const Header = () => (
             animationDelay: `${7 * 0.1}s`,
           }}
         >
-          <Twitter size={18} />
+          <Twitter size={18} alt="Twitter" />
         </a>
       </div>
     </Container>

@@ -18,22 +18,19 @@ const PostLink = ({
     sx={{
       animation: `0.2s ${index * 0.02}s fadeInUp backwards`,
       transition: "transform 0.2s",
-      "&:hover": {
-        transform: "scale(1.02)",
-      },
-      // ...(image ?? {
-      //   position: "relative",
-      //   "&::before": {
-      //     content: '" "',
-      //     display: "block",
-      //     position: "absolute",
-      //     top: "0px",
-      //     width: "64px",
-      //     height: "2px",
-      //     backgroundColor: "primary",
-      //     zIndex: -1,
-      //   },
-      // }),
+      ...(image ?? {
+        position: "relative",
+        "&::before": {
+          content: '" "',
+          display: "block",
+          position: "absolute",
+          top: "0px",
+          width: "64px",
+          height: "2px",
+          backgroundColor: "primary",
+          zIndex: -1,
+        },
+      }),
     }}
   >
     {image && (
@@ -41,9 +38,9 @@ const PostLink = ({
         <Image
           sx={{ borderRadius: 4 }}
           fluid={image.childImageSharp.fluid}
-          alt={imageAlt}
+          alt={imageAlt || title}
           width="100%"
-          height="240"
+          height="190"
         />
       </Styled.a>
     )}

@@ -3,7 +3,7 @@ export default {
   space: [0, 4, 8, 16, 24, 32, 48, 64, 96, 128, 256, 512],
   fonts: {
     body: `"Source Sans Pro", sans-seif`,
-    heading: `Lora, serif`,
+    heading: `"Lora", serif`,
     monospace: `"Source Code Pro", monospace`,
   },
   fontSizes: [12, 14, 16, 20, 24, 32, 48, 56, 64, 80],
@@ -25,7 +25,8 @@ export default {
   colors: {
     text: "#130303",
     background: "#fff",
-    primary: "#009FFD",
+    // primary: "#009BF5",
+    primary: "#006aec",
     secondary: "#FFA400",
     muted: "#5f6368",
     border: "#eee",
@@ -66,36 +67,38 @@ export default {
     },
     h1: {
       variant: "text.heading",
-      fontSize: 6,
+      fontSize: [5, 6],
     },
     h2: {
       variant: "text.heading",
-      fontSize: 4,
+      fontSize: [4, 5],
     },
     h3: {
       variant: "text.heading",
-      fontSize: 3,
+      fontSize: [3, 4],
     },
     h4: {
       variant: "text.heading",
-      fontSize: 2,
+      fontSize: [2, 3],
     },
     h5: {
       variant: "text.heading",
-      fontSize: 1,
+      fontSize: [1, 2],
     },
     h6: {
       variant: "text.heading",
-      fontSize: 0,
+      fontSize: [0, 1],
     },
     p: {
       letterSpacing: "-0.003em",
       code: {
-        display: "inline-block",
+        display: "inline-flex",
+        maxWidth: "100%",
         px: 1,
         fontSize: "85%",
         borderRadius: 4,
         backgroundColor: "border",
+        overflow: "auto",
       },
     },
     pre: {

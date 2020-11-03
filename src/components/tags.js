@@ -9,7 +9,7 @@ const Tags = ({ tags, ...props }) => (
       fontWeight: "bold",
       letterSpacing: "loose",
       textTransform: "uppercase",
-      color: "primary",
+      color: "muted",
     }}
     {...props}
   >

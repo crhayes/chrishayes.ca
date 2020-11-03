@@ -15,13 +15,15 @@ const Home = () => (
       <section
         sx={{
           mt: [5, 9],
-          fontSize: 4,
+          fontSize: [3, 4],
         }}
       >
         <Styled.h1
           sx={{
+            mt: 0,
             mb: 5,
             fontSize: [6, 9],
+            lineHeight: "1.125",
             animation: fadeInUpAnimation,
             animationDelay: `${1 * 0.1}s`,
           }}

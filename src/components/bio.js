@@ -20,7 +20,7 @@ const Bio = () => {
         columnGap: 5,
         alignItems: "center",
         justifyItems: "center",
-        maxWidth: "70%",
+        maxWidth: [null, "70%"],
         my: [6, 7],
         mx: "auto",
       }}
@@ -28,7 +28,7 @@ const Bio = () => {
       <div>
         <Image
           sx={{
-            width: [75, 100],
+            width: 100,
             borderRadius: "50%",
           }}
           fluid={avatar.childImageSharp.fluid}
