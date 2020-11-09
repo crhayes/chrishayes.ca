@@ -8,7 +8,7 @@ slug: object-oriented-form-and-html-macros
 tags: [Laravel]
 ---
 
-[In an earlier post](/dry-up-your-views-with-form-and-html-macros) I talked about how to utilize form and HTML macros to DRY up your views. The one thing I don’t like about these form macros is that they are global code, and it doesn’t really feel like they have a proper home. Sure, we can put that code in our `routes.php` , or `global.php` , but it definitely takes away from the object-oriented nature of the framework. Furthermore, any common functionality between macros can only be refactored into a global function rather than a class method.
+[In an earlier post](/dry-up-your-views-with-form-and-html-macros) I talked about how to utilize form and HTML macros to DRY up your views. The one thing I don’t like about these form macros is that they are global code, and it doesn’t really feel like they have a proper home. Sure, we can put that code in our `routes.php`, or `global.php`, but it definitely takes away from the object-oriented nature of the framework. Furthermore, any common functionality between macros can only be refactored into a global function rather than a class method.
 
 In this post I’ll discuss how we can refactor that code into classes and load it with a service provider class.
 

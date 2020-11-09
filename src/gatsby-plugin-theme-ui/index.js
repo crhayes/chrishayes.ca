@@ -1,3 +1,15 @@
+const inlineCode = {
+  code: {
+    display: "inline-flex",
+    maxWidth: "100%",
+    px: 1,
+    fontSize: "85%",
+    borderRadius: 4,
+    backgroundColor: "border",
+    overflow: "auto",
+  },
+}
+
 export default {
   breakpoints: ["40em"],
   space: [0, 4, 8, 16, 24, 32, 48, 64, 96, 128, 256, 512],
@@ -25,7 +37,6 @@ export default {
   colors: {
     text: "#130303",
     background: "#fff",
-    // primary: "#009BF5",
     primary: "#006aec",
     secondary: "#FFA400",
     muted: "#5f6368",
@@ -91,15 +102,10 @@ export default {
     },
     p: {
       letterSpacing: "-0.003em",
-      code: {
-        display: "inline-flex",
-        maxWidth: "100%",
-        px: 1,
-        fontSize: "85%",
-        borderRadius: 4,
-        backgroundColor: "border",
-        overflow: "auto",
-      },
+      ...inlineCode,
+    },
+    li: {
+      ...inlineCode,
     },
     pre: {
       p: 3,
