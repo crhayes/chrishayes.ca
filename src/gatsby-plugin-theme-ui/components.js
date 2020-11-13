@@ -2,6 +2,8 @@
 import { jsx, css } from "theme-ui"
 import Prism from "@theme-ui/prism"
 
+import Link from "../components/link"
+
 // from https://octicons.github.com/icon/link/
 const LinkIcon = props => (
   <svg
@@ -60,4 +62,9 @@ export default {
   pre: props => props.children,
   code: Prism,
   ...headings,
+  a: ({ children, href, ...props }) => (
+    <Link to={href} {...props}>
+      {children}
+    </Link>
+  ),
 }

@@ -3,6 +3,7 @@ import { jsx, Container, Styled } from "theme-ui"
 import Img from "gatsby-image"
 import { graphql } from "gatsby"
 
+import Link from "../components/link"
 import SEO from "../components/seo"
 import Layout from "../components/layout"
 
@@ -20,14 +21,12 @@ const NotFoundPage = ({ data: { file } }) => (
       <SEO title="Not of this World" />
       <div sx={{ width: [300, 400], mx: "auto" }}>
         <Img fluid={file.childImageSharp.fluid} />
-        <Styled.a
-          href="https://icons8.com/"
-          rel="noopener"
-          target="_blank"
+        <Link
+          to="https://icons8.com/"
           sx={{ mt: 4, fontSize: 0, color: "muted", border: "none" }}
         >
           Image courtesy of Icons8
-        </Styled.a>
+        </Link>
       </div>
       <Styled.h1 sx={{ mt: 5 }}>404</Styled.h1>
       <Styled.h2 sx={{ mt: 2 }}>

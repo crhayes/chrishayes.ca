@@ -2,6 +2,7 @@
 import Image from "gatsby-image"
 import { jsx, Styled } from "theme-ui"
 
+import Link from "./link"
 import Tags from "./tags"
 
 const PostLink = ({
@@ -35,7 +36,7 @@ const PostLink = ({
     }}
   >
     {image && (
-      <Styled.a href={slug}>
+      <Link to={slug} sx={{ variant: "link" }}>
         <Image
           sx={{ borderRadius: 4 }}
           fluid={image.childImageSharp.fluid}
@@ -43,15 +44,15 @@ const PostLink = ({
           width="100%"
           height="190"
         />
-      </Styled.a>
+      </Link>
     )}
     <Tags tags={tags} sx={{ minHeight: "1.5em", mt: 3 }} />
-    <Styled.a href={slug}>
+    <Link to={slug} sx={{ variant: "link" }}>
       <Styled.h2 sx={{ mt: 1, fontSize: image ? 4 : 5 }}>{title}</Styled.h2>
-    </Styled.a>
-    <Styled.a href={slug} sx={{ mt: 3 }}>
+    </Link>
+    <Link to={slug} sx={{ variant: "link", mt: 3 }}>
       <p sx={{ color: "muted" }}>{preview}</p>
-    </Styled.a>
+    </Link>
     <time
       sx={{
         mt: 3,

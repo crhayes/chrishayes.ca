@@ -1,4 +1,5 @@
 /** @jsx jsx */
+import Link from "./link"
 import { jsx, Container } from "theme-ui"
 import { GitHub, Linkedin, Twitter } from "react-feather"
 
@@ -25,8 +26,8 @@ const Header = () => (
         py: 4,
       }}
     >
-      <a
-        href="/"
+      <Link
+        to="/"
         sx={{
           variant: "link",
           fontSize: 3,
@@ -37,10 +38,10 @@ const Header = () => (
         }}
       >
         Chris Hayes
-      </a>
+      </Link>
       <div sx={{ display: "flex", fontWeight: "bold" }}>
-        <a
-          href="/"
+        <Link
+          to="/"
           sx={{
             variant: "link",
             display: ["none", "block"],
@@ -50,9 +51,9 @@ const Header = () => (
           }}
         >
           Home
-        </a>
-        <a
-          href="/articles"
+        </Link>
+        <Link
+          to="/articles"
           sx={{
             variant: "link",
             animation: fadeInDownAnimation,
@@ -60,14 +61,12 @@ const Header = () => (
           }}
         >
           Articles
-        </a>
+        </Link>
       </div>
       <div sx={{ display: "flex" }}>
-        <a
-          href="https://github.com/crhayes"
+        <Link
+          to="https://github.com/crhayes"
           aria-label="Visit My Github"
-          target="_blank"
-          rel="noopener noreferrer"
           sx={{
             variant: "link",
             display: "inline-flex",
@@ -78,12 +77,10 @@ const Header = () => (
           }}
         >
           <GitHub size={18} alt="Github" />
-        </a>
-        <a
-          href="https://linkedin.com/in/crhayes"
+        </Link>
+        <Link
+          to="https://linkedin.com/in/crhayes"
           aria-label="Visit My LinkedIn"
-          target="_blank"
-          rel="noopener noreferrer"
           sx={{
             variant: "link",
             display: "inline-flex",
@@ -94,12 +91,10 @@ const Header = () => (
           }}
         >
           <Linkedin size={18} alt="LinkedIn" />
-        </a>
-        <a
-          href="https://twitter.com/crhayes_"
+        </Link>
+        <Link
+          to="https://twitter.com/crhayes_"
           aria-label="Visit My Twitter"
-          target="_blank"
-          rel="noopener noreferrer"
           sx={{
             variant: "link",
             display: "inline-flex",
@@ -109,7 +104,7 @@ const Header = () => (
           }}
         >
           <Twitter size={18} alt="Twitter" />
-        </a>
+        </Link>
       </div>
     </Container>
   </header>

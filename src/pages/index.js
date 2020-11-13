@@ -4,6 +4,7 @@ import { jsx, Container, Styled } from "theme-ui"
 import { graphql, useStaticQuery } from "gatsby"
 
 import Layout from "../components/layout"
+import Link from "../components/link"
 import PostGrid from "../components/post-grid"
 import SEO from "../components/seo"
 import Skills from "../components/skills"
@@ -127,9 +128,10 @@ const RecentRamblings = () => {
         // can pick up where they left off on the articles page
         return (
           <div sx={{ display: "flex", justifyContent: "center", mt: 7 }}>
-            <Styled.a
-              href={`/articles#${lastPostSlug.replace(/\//g, "")}`}
+            <Link
+              to={`/articles#${lastPostSlug.replace(/\//g, "")}`}
               sx={{
+                variant: "link",
                 px: 5,
                 py: 3,
                 border: "1px solid",
@@ -138,7 +140,7 @@ const RecentRamblings = () => {
               }}
             >
               Continue Perusing &#8594;
-            </Styled.a>
+            </Link>
           </div>
         )
       })()}
