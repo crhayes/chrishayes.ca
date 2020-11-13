@@ -1,5 +1,4 @@
 /** @jsx jsx */
-import React from "react"
 import { jsx } from "theme-ui"
 
 const SKILLS = [
@@ -13,12 +12,10 @@ const SKILLS = [
   "Jest",
   "Cypress",
   "Laravel",
-  <React.Fragment>
-    Caffeine <small sx={{ color: "muted" }}>(The Drug)</small>
-  </React.Fragment>,
+  "Node.js",
+  "Docker",
   "Git & Github",
   "Bash",
-  "Node.js",
   "Visual Studio Code",
   "Unit Testing",
   "e2e Testing",
