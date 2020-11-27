@@ -1,0 +1,255 @@
+---
+title: Build Better User Experiences with Mocked Apollo Queries
+date: 2020-11-27
+image: ./apollo.jpg
+imageAlt: Building with two signs that both read "Apollo".
+imageURL: https://unsplash.com/photos/gPnMZCZwsW0
+slug: build-better-user-experiences-with-mocked-apollo-queries
+tags: [React, Apollo]
+---
+
+Whether you're practicing Test Driven Development or Storybook Driven Development the ability to mock data is extremely important, and I don't say that in _Jest_ 🤡.
+
+Building a resilient application with great UX is important, but when developing against a _real_ backend it can be difficult to simulate conditions that may cause frustrating experiences for users, like waiting for things to load or having the application error. Mocking our backend allows us to simulate these specific scenarios and ensure we're developing the best experience possible.
+
+With that being said, mocking Apollo queries can be repetitive and verbose, so below are some helpful utility functions written in TypeScript that make it nicer.
+
+## Loading States
+
+Loading states can be tested easily in your test framework of choice by simply [mocking a query](https://www.apollographql.com/docs/react/development-testing/testing/#mockedprovider) with `MockedProvider`. The mocks are implemented so that when your tests execute your component will have `loading` set to `true` on the first tick of the JavaScript event loop. This is when you can make your assertions that the loading state is displayed as intended.
+
+On the next `tick` of the event loop, your component will have `loading` set to `false` and your `data` will be resolved. Behind the scenes, [this is achieved](https://github.com/apollographql/apollo-client/blob/de4b911968a7a9163d6cb111d36c1267bf7585fb/src/utilities/testing/mocking/mockLink.ts#L113-L141) via an Apollo Link that intercepts your request and returns an Observable that resolves with your mocked data after `setTimeout(..., 0)`.
+
+However, I often create Storybook stories for component loading states and this default behaviour is not desirable because the loading state simply flashes for a moment then disappears.
+
+The following helper performs a query with a specified `delay` that keeps the component in a loading state indefinitely (well... nearly). This `delay` value is actually passed to the `setTimeout` function we linked to earlier, which halts resolving the Observable until the `delay` has elapsed.
+
+Since this value is passed to `setTimeout` we need to be cautious and use a supported value. Your intuition may lead you to set the `delay` to `Infinity`, though unfortunately, that won't work. The W3C timer spec specifies the value `Infinity` (and several others) should be replaced with `0`; [this Github comment](https://github.com/denysdovhan/wtfjs/issues/61#issuecomment-325321753) summarizes things nicely.
+
+Given [most browsers](https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/setTimeout#Maximum_delay_value) store this `delay` as a 32-bit signed integer, which has a max value of `2,147,483,647`, we'll use that instead and assign the value to `MAX_SETTIMEOUT_VALUE`.
+
+```tsx
+import { DocumentNode } from "graphql"
+import { MockedResponse } from "@apollo/react-testing"
+import { OperationVariables } from "@apollo/react-common"
+
+const MAX_SETTIMEOUT_VALUE = 2147483647
+
+/**
+ * Mock a GraphQL query that's still loading.
+ */
+export function mockLoadingQuery<TVariables = OperationVariables>(options: {
+  query: DocumentNode
+  variables?: TVariables
+}): MockedResponse {
+  const { query, variables } = options
+  return {
+    request: {
+      query,
+      ...(variables && { variables }),
+    },
+    delay: MAX_SETTIMEOUT_VALUE,
+    result: {},
+  }
+}
+```
+
+The end result is that it becomes super simple to render your component in an indefinite loading state:
+
+```tsx
+import { mockLoadingQuery } from "./your-choice";
+
+export const loading = () => {
+  const mocks = [
+    mockLoadingQuery<UserDetailsQueryVariables>({
+      query: USER_DETAILS_QUERY,
+      variables: {
+        username: "chrishayes",
+      },
+    }),
+  ];
+  return (
+    <MockedProvider mocks={mocks}>
+      <UserDetails username="chrishayes" />
+    </StoryProvider>
+  );
+};
+
+```
+
+## Successful Query State
+
+There isn't as much fanfare for the standard success state.
+
+```tsx
+import { DocumentNode } from "graphql"
+import { MockedResponse } from "@apollo/react-testing"
+import { OperationVariables } from "@apollo/react-common"
+
+/**
+ * Mock a successful GraphQL query.
+ */
+export function mockQuery<TData, TVariables = OperationVariables>(options: {
+  query: DocumentNode
+  variables?: TVariables
+  data: TData
+}): MockedResponse {
+  const { query, variables, data } = options
+  return {
+    request: {
+      query,
+      ...(variables && { variables }),
+    },
+    result: {
+      data,
+    },
+  }
+}
+```
+
+Though it's just as easy to use:
+
+```tsx
+import { mockQuery } from "./your-choice";
+
+export const loaded = () => {
+  const mocks = [
+    mockQuery<UserDetailsQuery, UserDetailsQueryVariables>({
+      query: USER_DETAILS_QUERY,
+      variables: {
+        username: "chrishayes",
+      },
+      data: {
+        user {
+          id: '1',
+          firstName: 'Chris',
+          lastName: 'Hayes',
+        }
+      },
+    }),
+  ];
+  return (
+    <MockedProvider mocks={mocks}>
+      <UserDetails username="chrishayes" />
+    </StoryProvider>
+  );
+};
+
+```
+
+## GraphQL Error State
+
+This state is useful for mocking scenarios where your request was handled successfully but the backend returned you an error, such as an authorization or validation error.
+
+This helper enforces your errors be instances of `GraphQLError`, which helps to ensure that your GraphQL response is properly formatted.
+
+```tsx
+import { DocumentNode, GraphQLError } from "graphql"
+import { MockedResponse } from "@apollo/react-testing"
+import { OperationVariables } from "@apollo/react-common"
+
+/**
+ * Mock a GraphQL query that erred.
+ */
+export function mockErrorQuery<TVariables = OperationVariables>(options: {
+  query: DocumentNode
+  variables?: TVariables
+  errors: GraphQLError[]
+}): MockedResponse {
+  const { query, variables, errors } = options
+  return {
+    request: {
+      query,
+      ...(variables && { variables }),
+    },
+    result: {
+      errors,
+    },
+  }
+}
+```
+
+Example usage:
+
+```tsx
+import { GraphQLError } from "graphql";
+import { mockErrorQuery } from "./your-choice";
+
+export const error = () => {
+  const mocks = [
+    mockErrorQuery<UserDetailsQueryVariables>({
+      query: USER_DETAILS_QUERY,
+      variables: {
+        username: "chrishayes",
+      },
+      errors: [new GraphQLError('Sorry, that input did not pass validation.')]
+    }),
+  ];
+  return (
+    <MockedProvider mocks={mocks}>
+      <UserDetails username="chrishayes" />
+    </StoryProvider>
+  );
+};
+```
+
+## Network Error State
+
+This error state is useful for mocking scenarios where an error occurred but the backend didn't send the errors as part of a well-formed GraphQL response, potentially because of a 500 response from the server or an internet outage.
+
+```tsx
+import { DocumentNode } from "graphql"
+import { MockedResponse } from "@apollo/react-testing"
+import { OperationVariables } from "@apollo/react-common"
+
+/**
+ * Mock a GraphQL query that had a network error.
+ */
+export function mockNetworkErrorQuery<
+  TVariables = OperationVariables
+>(options: {
+  query: DocumentNode
+  variables?: TVariables
+  error: Error
+}): MockedResponse {
+  const { query, variables, error } = options
+  return {
+    request: {
+      query,
+      ...(variables && { variables }),
+    },
+    error,
+  }
+}
+```
+
+Example usage:
+
+```tsx
+import { mockNetworkErrorQuery } from "./your-choice";
+
+export const networkError = () => {
+  const mocks = [
+    mockNetworkErrorQuery<UserDetailsQueryVariables>({
+      query: USER_DETAILS_QUERY,
+      variables: {
+        username: "chrishayes",
+      },
+      error: new Error('Something went wrong!'),
+    }),
+  ];
+  return (
+    <MockedProvider mocks={mocks}>
+      <UserDetails username="chrishayes" />
+    </StoryProvider>
+  );
+};
+```
+
+## Conclusion
+
+Building resilient applications takes a lot of work, and developing against a _real_ backend can make it difficult to simulate the conditions that will lead to frustrating user experiences.
+
+Incorporating Storybook stories and tests for all of these scenarios is extremely important, though it's often cumbersome so we may not do it.
+
+To consistently test and build for these scenarios it needs to be _that much simpler,_ and that is what these helpers aim to accomplish.
