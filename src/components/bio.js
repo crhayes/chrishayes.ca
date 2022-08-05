@@ -37,7 +37,7 @@ const Bio = () => {
       </div>
       <p sx={{ fontSize: [2, 3], textAlign: ["center", "left"] }}>
         Written by <strong>Chris Hayes</strong>, a passionate{" "}
-        <strong>Senior Software Engineer</strong> buiding great user experiences
+        <strong>Software Engineer</strong> building great user experiences
         with quality code.
       </p>
     </div>
